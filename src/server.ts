@@ -1,10 +1,33 @@
-import { prisma } from "./lib/prisma"
+import app from "./app";
 
 
+const port = process.env.PORT || 5000;
+
+const server = app.listen(port, () => {
+    try {
+        console.log(`😀 Server is running on port ${process.env.PORT}`)
+    } catch (error: any) {
+        console.log(`😡 Failed to start server - ${error.message}`)
+    }
+});
 
 
-const main = async () => {
-    const user = await prisma.user.findMany()
-    console.log(user)
-}
-main()
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('😡 Unhandled Rejection at:', promise, 'reason:', reason);
+    if (server) {
+        server.close(() => {
+            console.log('😡 Server closed due to unhandled promise rejection');
+            process.exit(1);
+        });
+    }
+});
+
+process.on('uncaughtException', (error) => {
+    console.log('😡 Uncaught Exception:', error);
+    if (server) {
+        server.close(() => {
+            console.log('😡 Server closed due to uncaught exception');
+            process.exit(1);
+        });
+    }
+});
