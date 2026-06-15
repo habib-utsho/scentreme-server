@@ -6,22 +6,33 @@ import catchAsync from "../../../lib/catchAsync";
 
 
 const createUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const result = await userServices.createUser(req.body);
+    try {
 
-    sendResponse(res, StatusCodes.CREATED, {
-        success: true,
-        message: 'User created successfully',
-        data: result
-    });
+        const result = await userServices.createUser(req.body);
+
+
+        sendResponse(res, StatusCodes.CREATED, {
+            success: true,
+            message: 'User created successfully',
+            data: result
+        });
+    } catch (error: any) {
+        console.error('Error creating user:', error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+            success: false,
+            message: error.name,
+            error: error.message || 'An unexpected error occurred'
+        });
+    }
 })
 
 const getUsers: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const result = await userServices.getUsers();
-    console.log(result);
+    const { result, meta } = await userServices.getUsers(req.query);
     sendResponse(res, StatusCodes.OK, {
         success: true,
         message: 'Users retrieved successfully',
-        data: result
+        data: result,
+        meta: meta
     });
 })
 

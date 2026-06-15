@@ -2,6 +2,7 @@ import { prisma } from "../../../lib/prisma";
 
 
 const createRole = async (payload: any) => {
+    console.log(payload, 'payload');
     const result = prisma.role.create({
         data: { ...payload, createdAt: new Date() }
     });
@@ -29,7 +30,7 @@ const getRoles = async (query: any) => {
     const skip = (page - 1) * limit;
 
 
-    const [total, result] = await prisma.$transaction([
+    const [total, result] = await Promise.all([
         prisma.role.count({
             where: parsedQuery
         }),
