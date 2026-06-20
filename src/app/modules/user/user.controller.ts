@@ -3,27 +3,19 @@ import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../lib/catchAsync";
+import AppError from "../../errors/appError";
 
 
 const createUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    try {
-
-        const result = await userServices.createUser(req.body);
+    const result = await userServices.createUser(req.body);
 
 
-        sendResponse(res, StatusCodes.CREATED, {
-            success: true,
-            message: 'User created successfully',
-            data: result
-        });
-    } catch (error: any) {
-        console.error('Error creating user:', error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-            success: false,
-            message: error.name,
-            error: error.message || 'An unexpected error occurred'
-        });
-    }
+    sendResponse(res, StatusCodes.CREATED, {
+        success: true,
+        message: 'User created successfully',
+        data: result
+    });
+
 })
 
 const getUsers: RequestHandler = catchAsync(async (req: Request, res: Response) => {

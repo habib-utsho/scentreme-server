@@ -1,17 +1,27 @@
 import { prisma } from "../../../lib/prisma";
-
+import bcrypt from "bcrypt"
+import AppError from "../../errors/appError";
+import { StatusCodes } from "http-status-codes";
 
 const createUser = async (payload: any) => {
     // Expect payload to contain user fields and optional profile object
 
     const role = payload.role_id ? await prisma.role.findUnique({ where: { id: payload.role_id } }) : await prisma.role.findUnique({ where: { name: 'customer' } });
     if (!role) {
-        throw new Error('Invalid role_id provided');
+        throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid role_id provided or default customer role not found');
     }
+
+
+    const hashedPassword = await bcrypt.hash(payload.password, parseInt(process.env.SALT_ROUNDS || '10'));
+    if (!hashedPassword) {
+        throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Password hashing failed');
+    }
+
+    console.log(hashedPassword, 'hashedPassword');
 
     const userData = {
         email: payload.email,
-        password: payload.password,
+        password: hashedPassword,
         role_id: role.id,
         status: payload.status || 'active',
         last_login_at: null,
