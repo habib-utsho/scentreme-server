@@ -3,7 +3,9 @@ import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../lib/catchAsync";
-import AppError from "../../errors/appError";
+import pick from "../../utils/pick";
+import { userFilterableFields, userSearchableFields } from "./user.constant";
+import { OPTIONS } from "../../constant";
 
 
 const createUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
@@ -19,7 +21,10 @@ const createUser: RequestHandler = catchAsync(async (req: Request, res: Response
 })
 
 const getUsers: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const { result, meta } = await userServices.getUsers(req.query);
+    const filteredQuery = pick(req.query, [...userFilterableFields, ...userSearchableFields]);
+    const options = pick(req.query, [...OPTIONS]);
+    const { result, meta } = await userServices.getUsers(filteredQuery, options);
+
     sendResponse(res, StatusCodes.OK, {
         success: true,
         message: 'Users retrieved successfully',
@@ -28,5 +33,18 @@ const getUsers: RequestHandler = catchAsync(async (req: Request, res: Response) 
     });
 })
 
+const getUserById: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await userServices.getUserById(id as string);
 
-export const userController = { createUser, getUsers }
+    sendResponse(res, StatusCodes.OK, {
+        success: true,
+        message: 'User retrieved successfully',
+        data: result
+    });
+})
+
+
+
+
+export const userController = { createUser, getUsers, getUserById }

@@ -2,10 +2,12 @@ import { prisma } from "../../../lib/prisma";
 import bcrypt from "bcrypt"
 import AppError from "../../errors/appError";
 import { StatusCodes } from "http-status-codes";
+import { TUser } from "./user.interface";
+import { userSearchableFields } from "./user.constant";
+import { TOptions } from "../../interface";
+import calculatePagination from "../../utils/calculatePagination";
 
-const createUser = async (payload: any) => {
-    // Expect payload to contain user fields and optional profile object
-
+const createUser = async (payload: TUser) => {
     const role = payload.role_id ? await prisma.role.findUnique({ where: { id: payload.role_id } }) : await prisma.role.findUnique({ where: { name: 'customer' } });
     if (!role) {
         throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid role_id provided or default customer role not found');
@@ -44,13 +46,13 @@ const createUser = async (payload: any) => {
 
     const result = await prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
-            data: userData
+            data: userData,
         });
 
         const createdProfile = await tx.profile.create({
             data: {
                 ...profile,
-                user_id: user.id
+                user_id: user.id,
             }
         });
 
@@ -59,26 +61,29 @@ const createUser = async (payload: any) => {
 
     return result;
 }
-const getUsers = async (query: any) => {
+
+
+
+const getUsers = async (query: Record<string, unknown>, options: TOptions) => {
+    const { searchTerm, ...filterableFields } = query;
 
     const parsedQuery: any = {};
-    if (query.searchTerm) {
-        parsedQuery.OR = [
-            { email: { contains: query.searchTerm, mode: 'insensitive' } },
-        ]
+
+
+    if (searchTerm) {
+        parsedQuery.OR = userSearchableFields.map(field => ({
+            [field]: { contains: searchTerm, mode: 'insensitive' }
+        }))
     }
 
-    const filterableFields = ['status', 'role_id'];
-    filterableFields.forEach(field => {
-        if (query[field]) {
-            parsedQuery[field] = query[field];
+
+    Object.keys(filterableFields).forEach((field: string) => {
+        if (filterableFields[field]) {
+            parsedQuery[field] = filterableFields[field];
         }
     })
 
-    const page = Math.max(1, parseInt(query.page as string) || 1);
-    const limit = Math.max(1, parseInt(query.limit as string) || 10);
-    const skip = (page - 1) * limit;
-
+    const { limit, page, skip } = calculatePagination(options);
 
     const [total, result] = await Promise.all([
         prisma.user.count({
@@ -88,7 +93,9 @@ const getUsers = async (query: any) => {
             where: parsedQuery,
             skip,
             take: limit,
-            orderBy: {
+            orderBy: options.sortBy && options.sortOrder ? {
+                [options.sortBy]: options.sortOrder,
+            } : {
                 createdAt: 'desc',
             },
             include: {
@@ -96,7 +103,20 @@ const getUsers = async (query: any) => {
             }
         }),
     ]);
-    return { result, meta: { total, page, totalPage: Math.ceil(total / limit), limit } };
+    return { result, meta: { total, limit, page, totalPage: Math.ceil(total / limit), } };
 }
 
-export const userServices = { createUser, getUsers }
+
+const getUserById = async (id: string) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id
+        },
+        include: {
+            role: true,
+        }
+    });
+    return user;
+}
+
+export const userServices = { createUser, getUsers, getUserById }

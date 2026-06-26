@@ -1,0 +1,1 @@
+export const OPTIONS = ['page', 'limit', 'sortBy', 'sortOrder'] as const;

@@ -11,6 +11,7 @@ export const createUserZodSchema = z.object({
         return !isNaN(parsedDate);
     }, "Invalid date format, expected a valid date string"),
     gender: z.enum(["Men", "Women", "Unisex"], "Gender must be 'Men', '  Women', or 'Unisex'"),
-    role_id: z.string().optional(),
+    role_id: z.string().optional().nullable(),
     status: z.enum(["active", "inactive"], "Status must be 'active' or 'inactive'").optional(),
 });
+
