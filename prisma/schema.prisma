@@ -25,6 +25,7 @@ model Role {
 enum UserStatus {
   active
   inactive
+  deleted
 }
 enum Gender {
   Men
@@ -37,13 +38,12 @@ model User {
   email                 String     @unique
   password              String
   role_id               String
-  status                UserStatus @default(active)
   last_login_at         DateTime?
   failed_login_attempts Int        @default(0)
   locked_until          DateTime?
+  status                UserStatus @default(active)
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
-  isDeleted             Boolean    @default(false)
   role                  Role       @relation(fields: [role_id], references: [id])
   profile               Profile?
 }
@@ -57,6 +57,7 @@ model Profile {
   date_of_birth DateTime?
   avatar_url String?
   gender    Gender?
+  isDeleted             Boolean    @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [user_id], references: [id])

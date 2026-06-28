@@ -30,7 +30,6 @@ const createUser = async (payload: TUser) => {
         locked_until: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        isDeleted: payload.isDeleted || false
     }
     const profile = {
         firstName: payload.first_name,
@@ -39,6 +38,7 @@ const createUser = async (payload: TUser) => {
         date_of_birth: payload.date_of_birth ? new Date(payload.date_of_birth) : null,
         avatar_url: payload.avatar_url,
         gender: payload.gender,
+        isDeleted: payload.isDeleted || false,
         createdAt: new Date(),
         updatedAt: new Date()
     }
@@ -82,6 +82,9 @@ const getUsers = async (query: Record<string, unknown>, options: TOptions) => {
             parsedQuery[field] = filterableFields[field];
         }
     })
+
+    // parsedQuery.status = 'active';
+    parsedQuery.status = { not: 'deleted' };
 
     const { limit, page, skip } = calculatePagination(options);
 

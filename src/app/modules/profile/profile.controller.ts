@@ -34,5 +34,17 @@ const updateProfile: RequestHandler = catchAsync(async (req: Request, res: Respo
     });
 })
 
-export const profileController = { getMe, updateProfile }
+
+const deleteProfile: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await profileServices.deleteProfile(id as string);
+
+    sendResponse(res, StatusCodes.OK, {
+        success: true,
+        message: 'Profile deleted successfully',
+        data: result
+    });
+})
+
+export const profileController = { getMe, updateProfile, deleteProfile }
 

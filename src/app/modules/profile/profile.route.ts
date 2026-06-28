@@ -6,10 +6,11 @@ import { updateProfileZodSchema } from "./profile.validation";
 
 const router = Router()
 
-
 router.get('/:id', profileController.getMe)
 
 router.patch('/:id', zodValidateHandler(updateProfileZodSchema), profileController.updateProfile)
+
+router.delete('/:id', profileController.deleteProfile)
 
 
 
