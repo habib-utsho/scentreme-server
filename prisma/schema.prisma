@@ -42,6 +42,7 @@ model User {
   failed_login_attempts Int        @default(0)
   locked_until          DateTime?
   status                UserStatus @default(active)
+  needsPasswordChange   Boolean    @default(false)
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
   role                  Role       @relation(fields: [role_id], references: [id])
