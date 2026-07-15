@@ -2,8 +2,7 @@ import z from "zod";
 export declare const createUserZodSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
-    first_name: z.ZodString;
-    last_name: z.ZodString;
+    name: z.ZodString;
     phone: z.ZodString;
     date_of_birth: z.ZodString;
     gender: z.ZodEnum<{

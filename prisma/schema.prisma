@@ -52,8 +52,7 @@ model User {
 model Profile {
   id        String   @id @default(uuid())
   user_id   String   @unique
-  firstName String
-  lastName  String
+  name      String?
   phone     String? @unique 
   date_of_birth DateTime?
   avatar_url String?

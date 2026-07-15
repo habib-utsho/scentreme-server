@@ -7,39 +7,38 @@ export declare const profileServices: {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        firstName: string;
-        lastName: string;
+        name: string | null;
+        user_id: string;
         phone: string | null;
         date_of_birth: Date | null;
         avatar_url: string | null;
         gender: import("../../../generated/prisma/enums").Gender | null;
         isDeleted: boolean;
-        user_id: string;
     }>;
     deleteProfile: (user_id: string) => Promise<{
         profileDelete: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            firstName: string;
-            lastName: string;
+            name: string | null;
+            user_id: string;
             phone: string | null;
             date_of_birth: Date | null;
             avatar_url: string | null;
             gender: import("../../../generated/prisma/enums").Gender | null;
             isDeleted: boolean;
-            user_id: string;
         };
         userDelete: {
             email: string;
             status: UserStatus;
             role_id: string;
             id: string;
-            createdAt: Date;
             password: string;
             last_login_at: Date | null;
             failed_login_attempts: number;
             locked_until: Date | null;
+            needsPasswordChange: boolean;
+            createdAt: Date;
             updatedAt: Date;
         };
     }>;

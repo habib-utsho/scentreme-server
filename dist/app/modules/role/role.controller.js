@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.roleController = void 0;
-const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
+const sendResponse_1 = require("../../utils/sendResponse");
 const http_status_codes_1 = require("http-status-codes");
-const catchAsync_1 = __importDefault(require("../../../lib/catchAsync"));
+const catchAsync_1 = require("../../../lib/catchAsync");
 const role_service_1 = require("./role.service");
 const createRole = (0, catchAsync_1.default)(async (req, res) => {
     const result = await role_service_1.roleServices.createRole(req.body);

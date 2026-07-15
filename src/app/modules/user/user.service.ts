@@ -32,8 +32,7 @@ const createUser = async (payload: TUser) => {
         updatedAt: new Date(),
     }
     const profile = {
-        firstName: payload.first_name,
-        lastName: payload.last_name,
+        name: payload.name,
         phone: payload.phone,
         date_of_birth: payload.date_of_birth ? new Date(payload.date_of_birth) : null,
         avatar_url: payload.avatar_url,
@@ -69,13 +68,29 @@ const getUsers = async (query: Record<string, unknown>, options: TOptions) => {
 
     const parsedQuery: any = {};
 
-
     if (searchTerm) {
-        parsedQuery.OR = userSearchableFields.map(field => ({
-            [field]: { contains: searchTerm, mode: 'insensitive' }
-        }))
-    }
+        parsedQuery.OR = userSearchableFields.map((field) => {
+            if (field.includes(".")) {
+                const [relation, nestedField] = field.split(".");
 
+                return {
+                    [relation as string]: {
+                        [nestedField as string]: {
+                            contains: searchTerm,
+                            mode: "insensitive",
+                        },
+                    },
+                };
+            }
+
+            return {
+                [field as string]: {
+                    contains: searchTerm,
+                    mode: "insensitive",
+                },
+            };
+        });
+    }
 
     Object.keys(filterableFields).forEach((field: string) => {
         if (filterableFields[field]) {
@@ -102,7 +117,8 @@ const getUsers = async (query: Record<string, unknown>, options: TOptions) => {
                 createdAt: 'desc',
             },
             include: {
-                role: true
+                role: true,
+                profile: true
             }
         }),
     ]);

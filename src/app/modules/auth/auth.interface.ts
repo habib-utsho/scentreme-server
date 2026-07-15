@@ -11,4 +11,5 @@ export type TPasswordUpdate = {
 export type TResetPassword = {
   email: string
   newPassword: string
+  passwordChangeAccessToken: string
 }

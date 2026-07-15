@@ -1,14 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.profileController = void 0;
-const catchAsync_1 = __importDefault(require("../../../lib/catchAsync"));
+const catchAsync_1 = require("../../../lib/catchAsync");
 const http_status_codes_1 = require("http-status-codes");
-const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
+const sendResponse_1 = require("../../utils/sendResponse");
 const profile_service_1 = require("./profile.service");
-const appError_1 = __importDefault(require("../../errors/appError"));
+const appError_1 = require("../../errors/appError");
 const getMe = (0, catchAsync_1.default)(async (req, res) => {
     const { id } = req.params;
     if (!id) {

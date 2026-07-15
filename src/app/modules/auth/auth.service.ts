@@ -7,70 +7,140 @@ import bcrypt from "bcrypt"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { sendEmail } from "../../utils/sendEmail"
 import { env } from "../../config/env"
+import jwtVerify from "../../utils/jwtVerify"
+
 
 const login = async (payload: TLoginUser) => {
-    const user = await prisma.user.findUnique({ where: { email: payload.email } })
+
+
+    const user = await prisma.user.findUnique({
+        where: { email: payload.email },
+    });
 
     if (!user) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'User not found!')
+        throw new AppError(StatusCodes.BAD_REQUEST, "User not found!");
     }
-    if (user?.status === UserStatus.inactive) {
-        throw new AppError(StatusCodes.FORBIDDEN, 'This user is not active!')
+
+    if (user.status === UserStatus.inactive) {
+        throw new AppError(StatusCodes.FORBIDDEN, "This user is not active!");
     }
+
     if (user.status === UserStatus.deleted) {
-        throw new AppError(StatusCodes.FORBIDDEN, 'This user is deleted!')
+        throw new AppError(StatusCodes.FORBIDDEN, "This user is deleted!");
     }
 
-    const profile = (await prisma.profile.findUnique({ where: { user_id: user?.id } }))
+    const profile = await prisma.profile.findUnique({
+        where: { user_id: user.id },
+    });
+
     if (profile?.isDeleted) {
-        throw new AppError(StatusCodes.FORBIDDEN, 'This profile is deleted!')
+        throw new AppError(StatusCodes.FORBIDDEN, "This profile is deleted!");
     }
 
-    const role = await prisma.role.findUnique({ where: { id: user?.role_id } })
+    const role = await prisma.role.findUnique({
+        where: { id: user.role_id },
+    });
 
     if (!role) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'Role not found!')
+        throw new AppError(StatusCodes.BAD_REQUEST, "Role not found!");
     }
 
+    //   Check if account is currently locked
+    if (user.locked_until) {
+        if (user.locked_until > new Date()) {
+            const remainingTime = Math.ceil(
+                (user.locked_until.getTime() - Date.now()) / 60000
+            );
 
-    const decryptPass = await bcrypt.compare(payload.password, user.password)
+            throw new AppError(
+                StatusCodes.FORBIDDEN,
+                `Account is locked due to multiple failed login attempts. Please try again after ${remainingTime} minute(s).`
+            );
+        }
 
-    if (!decryptPass) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'Incorrect password!')
+        // Lock expired -> reset attempts
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                failed_login_attempts: 0,
+                locked_until: null,
+            },
+        });
+
+        user.failed_login_attempts = 0;
+        user.locked_until = null;
     }
 
+    //   Verify password
+    const isPasswordMatched = await bcrypt.compare(
+        payload.password,
+        user.password
+    );
+
+    if (!isPasswordMatched) {
+        const attempts = (user.failed_login_attempts ?? 0) + 1;
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                failed_login_attempts: attempts,
+                ...(attempts >= parseInt(process.env.MAX_LOGIN_ATTEMPTS as string) && {
+                    locked_until: new Date(Date.now() + parseInt(process.env.LOCK_TIME as string)),
+                }),
+            },
+        });
+
+        throw new AppError(
+            StatusCodes.BAD_REQUEST,
+            "Incorrect password!"
+        );
+    }
+
+    //   Generate JWT payload
     const jwtPayload = {
-        userId: user?.id,
+        userId: user.id,
         profileId: profile?.id,
-        email: user?.email,
-        role: role?.name,
+        email: user.email,
+        role: role.name,
         name: `${profile?.firstName} ${profile?.lastName}`,
-        profileImg: profile?.avatar_url
-    }
+        profileImg: profile?.avatar_url,
+    };
 
     const accessToken = jwt.sign(
         jwtPayload,
         process.env.JWT_ACCESS_SECRET as string,
         {
             expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as string,
-        } as jwt.SignOptions,
-    )
+        } as jwt.SignOptions
+    );
 
     const refreshToken = jwt.sign(
         jwtPayload,
         process.env.JWT_REFRESH_SECRET as string,
         {
             expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as string,
-        } as jwt.SignOptions,
-    )
+        } as jwt.SignOptions
+    );
+
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            last_login_at: new Date(),
+            failed_login_attempts: 0,
+            locked_until: null,
+        },
+    });
+
+    const { password, ...safeUser } = user;
 
     return {
         accessToken,
         refreshToken,
-        data: user,
-        needsPasswordChange: user?.needsPasswordChange,
-    }
-}
+        data: safeUser,
+        needsPasswordChange: user.needsPasswordChange,
+    };
+};
 
 const refreshToken = async (token: string) => {
 
@@ -320,23 +390,41 @@ const resetPassword = async (
     payload: TResetPassword,
     jwtPayload: JwtPayload,
 ) => {
+    console.log({ payload, jwtPayload })
+
+    const decoded = (await jwtVerify(
+        payload.passwordChangeAccessToken,
+        process.env.JWT_ACCESS_SECRET as string,
+    )) as JwtPayload
+
+    if (!decoded) {
+        throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized to reset password!')
+    }
+
+    if (decoded.email !== jwtPayload.email) {
+        throw new AppError(
+            StatusCodes.FORBIDDEN,
+            'You are not authorized to reset password for this user',
+        )
+    }
+
     const user = await prisma.user.findUnique({ where: { email: payload.email } })
 
     if (!user) {
         throw new AppError(StatusCodes.NOT_FOUND, 'User not found!')
     }
-    if (user.status === UserStatus.inactive) {
-        throw new AppError(StatusCodes.FORBIDDEN, 'This user is not active!')
-    }
-    if (user.status === UserStatus.deleted) {
-        throw new AppError(StatusCodes.FORBIDDEN, 'This user is deleted!')
-    }
-
     if (jwtPayload.email != user.email) {
         throw new AppError(
             StatusCodes.FORBIDDEN,
             'You are not authorized to reset password for this user',
         )
+    }
+
+    if (user.status === UserStatus.inactive) {
+        throw new AppError(StatusCodes.FORBIDDEN, 'This user is not active!')
+    }
+    if (user.status === UserStatus.deleted) {
+        throw new AppError(StatusCodes.FORBIDDEN, 'This user is deleted!')
     }
 
     const hashedPass = await bcrypt.hash(

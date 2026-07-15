@@ -3,9 +3,9 @@ export type * from '../models';
 export type * from './prismaNamespace';
 export declare const Decimal: typeof runtime.Decimal;
 export declare const NullTypes: {
-    DbNull: (new (secret: never) => typeof runtime.DbNull);
-    JsonNull: (new (secret: never) => typeof runtime.JsonNull);
-    AnyNull: (new (secret: never) => typeof runtime.AnyNull);
+    DbNull: new (secret: never) => typeof runtime.DbNull;
+    JsonNull: new (secret: never) => typeof runtime.JsonNull;
+    AnyNull: new (secret: never) => typeof runtime.AnyNull;
 };
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
@@ -54,6 +54,7 @@ export declare const UserScalarFieldEnum: {
     readonly failed_login_attempts: "failed_login_attempts";
     readonly locked_until: "locked_until";
     readonly status: "status";
+    readonly needsPasswordChange: "needsPasswordChange";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -61,8 +62,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export declare const ProfileScalarFieldEnum: {
     readonly id: "id";
     readonly user_id: "user_id";
-    readonly firstName: "firstName";
-    readonly lastName: "lastName";
+    readonly name: "name";
     readonly phone: "phone";
     readonly date_of_birth: "date_of_birth";
     readonly avatar_url: "avatar_url";

@@ -14,42 +14,9 @@
  * If you are looking for your Models, Enums, and Input Types, please import them from the respective
  * model files in the `model` directory!
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.ProfileScalarFieldEnum = exports.UserScalarFieldEnum = exports.RoleScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
-const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
+const runtime = require("@prisma/client/runtime/index-browser");
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
     DbNull: runtime.NullTypes.DbNull,
@@ -103,14 +70,14 @@ exports.UserScalarFieldEnum = {
     failed_login_attempts: 'failed_login_attempts',
     locked_until: 'locked_until',
     status: 'status',
+    needsPasswordChange: 'needsPasswordChange',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
 exports.ProfileScalarFieldEnum = {
     id: 'id',
     user_id: 'user_id',
-    firstName: 'firstName',
-    lastName: 'lastName',
+    name: 'name',
     phone: 'phone',
     date_of_birth: 'date_of_birth',
     avatar_url: 'avatar_url',

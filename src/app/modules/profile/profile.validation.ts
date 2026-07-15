@@ -1,8 +1,7 @@
 import z from "zod";
 
 export const updateProfileZodSchema = z.object({
-    first_name: z.string().min(2, "First name must be at least 2 characters long").optional(),
-    last_name: z.string().min(2, "Last name must be at least 2 characters long").optional(),
+    name: z.string().min(5, "Name must be at least 5 characters long").optional(),
     phone: z.string().min(10, "Phone number must be at least 10 digits long").optional(),
     date_of_birth: z.string().refine((date) => {
         const parsedDate = Date.parse(date);

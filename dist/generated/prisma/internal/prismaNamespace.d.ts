@@ -61,9 +61,9 @@ export type InputJsonObject = runtime.InputJsonObject;
 export type InputJsonArray = runtime.InputJsonArray;
 export type InputJsonValue = runtime.InputJsonValue;
 export declare const NullTypes: {
-    DbNull: (new (secret: never) => typeof runtime.DbNull);
-    JsonNull: (new (secret: never) => typeof runtime.JsonNull);
-    AnyNull: (new (secret: never) => typeof runtime.AnyNull);
+    DbNull: new (secret: never) => typeof runtime.DbNull;
+    JsonNull: new (secret: never) => typeof runtime.JsonNull;
+    AnyNull: new (secret: never) => typeof runtime.AnyNull;
 };
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
@@ -522,6 +522,7 @@ export declare const UserScalarFieldEnum: {
     readonly failed_login_attempts: "failed_login_attempts";
     readonly locked_until: "locked_until";
     readonly status: "status";
+    readonly needsPasswordChange: "needsPasswordChange";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -529,8 +530,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export declare const ProfileScalarFieldEnum: {
     readonly id: "id";
     readonly user_id: "user_id";
-    readonly firstName: "firstName";
-    readonly lastName: "lastName";
+    readonly name: "name";
     readonly phone: "phone";
     readonly date_of_birth: "date_of_birth";
     readonly avatar_url: "avatar_url";
@@ -591,6 +591,10 @@ export type EnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  */
 export type ListEnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStatus[]'>;
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
+/**
  * Reference to a field of type 'Gender'
  */
 export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>;
@@ -598,10 +602,6 @@ export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
  * Reference to a field of type 'Gender[]'
  */
 export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>;
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 /**
  * Reference to a field of type 'Float'
  */
@@ -616,7 +616,7 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
 export type BatchPayload = {
     count: number;
 };
-export declare const defineExtension: runtime.Types.Extensions.ExtendsHook<"define", TypeMapCb, runtime.Types.Extensions.DefaultArgs>;
+export declare const defineExtension: runtime.ExtendsHook<"define", TypeMapCb<{}>, runtime.DefaultArgs, TypeMap<runtime.InternalArgs & runtime.DefaultArgs, {}>>;
 export type DefaultPrismaClient = PrismaClient;
 export type ErrorFormat = 'pretty' | 'colorless' | 'minimal';
 export type PrismaClientOptions = ({

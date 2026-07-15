@@ -1,15 +1,12 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userServices = void 0;
 const prisma_1 = require("../../../lib/prisma");
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const appError_1 = __importDefault(require("../../errors/appError"));
+const bcrypt_1 = require("bcrypt");
+const appError_1 = require("../../errors/appError");
 const http_status_codes_1 = require("http-status-codes");
 const user_constant_1 = require("./user.constant");
-const calculatePagination_1 = __importDefault(require("../../utils/calculatePagination"));
+const calculatePagination_1 = require("../../utils/calculatePagination");
 const createUser = async (payload) => {
     const role = payload.role_id ? await prisma_1.prisma.role.findUnique({ where: { id: payload.role_id } }) : await prisma_1.prisma.role.findUnique({ where: { name: 'customer' } });
     if (!role) {
@@ -31,8 +28,7 @@ const createUser = async (payload) => {
         updatedAt: new Date(),
     };
     const profile = {
-        firstName: payload.first_name,
-        lastName: payload.last_name,
+        name: payload.name,
         phone: payload.phone,
         date_of_birth: payload.date_of_birth ? new Date(payload.date_of_birth) : null,
         avatar_url: payload.avatar_url,
@@ -59,9 +55,25 @@ const getUsers = async (query, options) => {
     const { searchTerm, ...filterableFields } = query;
     const parsedQuery = {};
     if (searchTerm) {
-        parsedQuery.OR = user_constant_1.userSearchableFields.map(field => ({
-            [field]: { contains: searchTerm, mode: 'insensitive' }
-        }));
+        parsedQuery.OR = user_constant_1.userSearchableFields.map((field) => {
+            if (field.includes(".")) {
+                const [relation, nestedField] = field.split(".");
+                return {
+                    [relation]: {
+                        [nestedField]: {
+                            contains: searchTerm,
+                            mode: "insensitive",
+                        },
+                    },
+                };
+            }
+            return {
+                [field]: {
+                    contains: searchTerm,
+                    mode: "insensitive",
+                },
+            };
+        });
     }
     Object.keys(filterableFields).forEach((field) => {
         if (filterableFields[field]) {
@@ -85,7 +97,8 @@ const getUsers = async (query, options) => {
                 createdAt: 'desc',
             },
             include: {
-                role: true
+                role: true,
+                profile: true
             }
         }),
     ]);

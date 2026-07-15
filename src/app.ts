@@ -5,7 +5,7 @@ import router from './app/routes';
 import { globalErrHandler, notFoundErrHandler } from './app/middleware/errHandler';
 import cookieParser from 'cookie-parser';
 
-const app = express(); 
+const app = express();
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('😀 Welcome to Anindya API!');
+    res.send('😀 Welcome to Scentreme API!');
 });
 app.use('/api/v1', router);
 

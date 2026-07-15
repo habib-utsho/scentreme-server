@@ -1,7 +1,6 @@
 import z from "zod";
 export declare const updateProfileZodSchema: z.ZodObject<{
-    first_name: z.ZodOptional<z.ZodString>;
-    last_name: z.ZodOptional<z.ZodString>;
+    name: z.ZodOptional<z.ZodString>;
     phone: z.ZodOptional<z.ZodString>;
     date_of_birth: z.ZodOptional<z.ZodString>;
     gender: z.ZodOptional<z.ZodEnum<{

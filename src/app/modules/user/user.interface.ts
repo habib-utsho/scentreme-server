@@ -2,8 +2,7 @@ export type TUser = {
     id: string;
     email: string;
     password: string;
-    first_name: string;
-    last_name: string;
+    name: string;
     phone: string;
     date_of_birth: string;
     gender: "Men" | "Women" | "Unisex";
