@@ -1,11 +1,12 @@
 import app from "./app";
+import { env } from "./app/config/env";
 
 
-const port = process.env.PORT || 5000;
+const port = env.PORT || 5000;
 
 const server = app.listen(port, () => {
     try {
-        console.log(`😀 Server is running on port ${process.env.PORT}`)
+        console.log(`😀 Server is running on port ${env.PORT}`)
     } catch (error: any) {
         console.log(`😡 Failed to start server - ${error.message}`)
     }

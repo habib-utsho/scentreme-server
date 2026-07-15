@@ -6,8 +6,9 @@ import { TUser } from "./user.interface";
 import { userSearchableFields } from "./user.constant";
 import { TOptions } from "../../interface";
 import calculatePagination from "../../utils/calculatePagination";
+import { uploadImgToCloudinary } from "../../utils/uploadImgToCloudinary";
 
-const createUser = async (payload: TUser) => {
+const createUser = async (payload: TUser, file: any) => {
     const role = payload.role_id ? await prisma.role.findUnique({ where: { id: payload.role_id } }) : await prisma.role.findUnique({ where: { name: 'customer' } });
     if (!role) {
         throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid role_id provided or default customer role not found');
@@ -31,6 +32,7 @@ const createUser = async (payload: TUser) => {
         createdAt: new Date(),
         updatedAt: new Date(),
     }
+
     const profile = {
         name: payload.name,
         phone: payload.phone,
@@ -48,6 +50,17 @@ const createUser = async (payload: TUser) => {
             data: userData,
         });
 
+        // file upload
+        if (file?.path) {
+            const cloudinaryRes = await uploadImgToCloudinary(
+                `${payload.name}-${Date.now()}`,
+                file.path,
+            )
+            if (cloudinaryRes?.secure_url) {
+                profile.avatar_url = cloudinaryRes.secure_url
+            }
+        }
+
         const createdProfile = await tx.profile.create({
             data: {
                 ...profile,
@@ -60,7 +73,6 @@ const createUser = async (payload: TUser) => {
 
     return result;
 }
-
 
 
 const getUsers = async (query: Record<string, unknown>, options: TOptions) => {

@@ -9,7 +9,7 @@ import { OPTIONS } from "../../constant";
 
 
 const createUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const result = await userServices.createUser(req.body);
+    const result = await userServices.createUser(req.body, req.file);
 
 
     sendResponse(res, StatusCodes.CREATED, {

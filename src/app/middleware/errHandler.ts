@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import handleZodErr from "../errors/handleZodErr";
 import { Prisma } from "../../generated/prisma/client";
 import { handlePrismaInitErr, handlePrismaKnownErr, handlePrismaPanicErr, handlePrismaUnknownErr, handlePrismaValidationErr } from "../errors/handlePrismaErr";
+import { env } from "../config/env";
 
 
 const notFoundErrHandler = (req: Request, res: Response) => {
@@ -59,7 +60,7 @@ const globalErrHandler = (err: CustomError, req: Request, res: Response, next: N
         success: false,
         message,
         errorSources,
-        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
+        stack: env.NODE_ENV === 'production' ? '🥞' : err.stack
     });
 };
 

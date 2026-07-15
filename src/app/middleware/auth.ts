@@ -7,6 +7,7 @@ import * as cookie from 'cookie'
 import jwtVerify from '../utils/jwtVerify'
 import { prisma } from '../../lib/prisma'
 import { UserStatus } from '../../generated/prisma/enums'
+import { env } from '../config/env'
 
 
 const auth = () => {
@@ -14,7 +15,7 @@ const auth = () => {
 
         // Parse cookies from header
         const token = req.headers.authorization || `Bearer ${cookie.parseCookie(req.headers?.cookie || "")?.accessToken}`;
-        console.log({token});
+        console.log({ token });
 
 
         if (!token) {
@@ -29,7 +30,7 @@ const auth = () => {
 
         const decoded = (await jwtVerify(
             bearerToken,
-            process.env.JWT_ACCESS_SECRET as string,
+            env.JWT_ACCESS_SECRET
         )) as JwtPayload
 
 

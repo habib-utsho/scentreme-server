@@ -84,8 +84,8 @@ const login = async (payload: TLoginUser) => {
             where: { id: user.id },
             data: {
                 failed_login_attempts: attempts,
-                ...(attempts >= parseInt(process.env.MAX_LOGIN_ATTEMPTS as string) && {
-                    locked_until: new Date(Date.now() + parseInt(process.env.LOCK_TIME as string)),
+                ...(attempts >= env.MAX_LOGIN_ATTEMPTS && {
+                    locked_until: new Date(Date.now() + env.LOCK_TIME),
                 }),
             },
         });
@@ -108,17 +108,17 @@ const login = async (payload: TLoginUser) => {
 
     const accessToken = jwt.sign(
         jwtPayload,
-        process.env.JWT_ACCESS_SECRET as string,
+        env.JWT_ACCESS_SECRET,
         {
-            expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as string,
+            expiresIn: env.JWT_ACCESS_EXPIRES_IN,
         } as jwt.SignOptions
     );
 
     const refreshToken = jwt.sign(
         jwtPayload,
-        process.env.JWT_REFRESH_SECRET as string,
+        env.JWT_REFRESH_SECRET,
         {
-            expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as string,
+            expiresIn: env.JWT_REFRESH_EXPIRES_IN as string,
         } as jwt.SignOptions
     );
 
@@ -148,7 +148,7 @@ const refreshToken = async (token: string) => {
     try {
         decoded = jwt.verify(
             token,
-            process.env.JWT_REFRESH_SECRET as string,
+            env.JWT_REFRESH_SECRET,
         ) as JwtPayload
     } catch (e: any) {
         throw new AppError(StatusCodes.UNAUTHORIZED, 'You are not authorized!')
@@ -194,9 +194,9 @@ const refreshToken = async (token: string) => {
 
     const accessToken = jwt.sign(
         jwtPayload,
-        process.env.JWT_ACCESS_SECRET as string,
+        env.JWT_ACCESS_SECRET,
         {
-            expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as string,
+            expiresIn: env.JWT_ACCESS_EXPIRES_IN,
         } as jwt.SignOptions,
     )
 
@@ -242,13 +242,13 @@ const forgetPassword = async (payload: Record<string, unknown>) => {
 
     const accessToken = jwt.sign(
         jwtPayload,
-        process.env.JWT_ACCESS_SECRET as string,
+        env.JWT_ACCESS_SECRET as string,
         {
             expiresIn: '10m' as string,
         } as jwt.SignOptions,
     )
 
-    const resetLink = `${process.env.CLIENT_URL}/reset-password?email=${user.email}&token=${accessToken}`
+    const resetLink = `${env.CLIENT_URL}/reset-password?email=${user.email}&token=${accessToken}`
     await sendEmail({
         toEmail: user.email,
         subject: `Reset Your Password – ${env.APP_NAME}`,
@@ -394,7 +394,7 @@ const resetPassword = async (
 
     const decoded = (await jwtVerify(
         payload.passwordChangeAccessToken,
-        process.env.JWT_ACCESS_SECRET as string,
+        env.JWT_ACCESS_SECRET as string,
     )) as JwtPayload
 
     if (!decoded) {
@@ -429,7 +429,7 @@ const resetPassword = async (
 
     const hashedPass = await bcrypt.hash(
         payload.newPassword,
-        Number(process.env.SALT_ROUNDS),
+        Number(env.SALT_ROUNDS),
     )
 
     const result = await prisma.user.update({
@@ -468,7 +468,7 @@ const changePassword = async (
 
     const hashedPass = await bcrypt.hash(
         payload.newPassword,
-        Number(process.env.SALT_ROUNDS),
+        Number(env.SALT_ROUNDS),
     )
 
     const result = await prisma.user.update({
