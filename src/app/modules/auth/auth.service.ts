@@ -102,7 +102,7 @@ const login = async (payload: TLoginUser) => {
         profileId: profile?.id,
         email: user.email,
         role: role.name,
-        name: `${profile?.firstName} ${profile?.lastName}`,
+        name: `${profile?.name}`,
         profileImg: profile?.avatar_url,
     };
 
@@ -187,7 +187,7 @@ const refreshToken = async (token: string) => {
         profileId: profile?.id,
         email: user?.email,
         role: role?.name,
-        name: `${profile?.firstName} ${profile?.lastName}`,
+        name: `${profile?.name}`,
         profileImg: profile?.avatar_url
     }
 
@@ -235,7 +235,7 @@ const forgetPassword = async (payload: Record<string, unknown>) => {
         profileId: profile?.id,
         email: user?.email,
         role: role?.name,
-        name: `${profile?.firstName} ${profile?.lastName}`,
+        name: profile?.name,
         profileImg: profile?.avatar_url
     }
 
@@ -353,7 +353,7 @@ This link will expire in 10 minutes. If you did not request this, please ignore 
     </div>
 
     <div class="content">
-      <h2>Hello ${profile?.firstName || 'User '} ${profile?.lastName || ''},</h2>
+      <h2>Hello ${profile?.name || 'User '},</h2>
 
       <p>We received a request to reset your password for your ${env.APP_NAME} account.</p>
 

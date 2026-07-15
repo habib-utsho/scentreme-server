@@ -116,6 +116,9 @@ const getUsers = async (query: Record<string, unknown>, options: TOptions) => {
             } : {
                 createdAt: 'desc',
             },
+            omit: {
+                password: true,
+            },
             include: {
                 role: true,
                 profile: true

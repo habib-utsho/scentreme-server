@@ -6,13 +6,15 @@ import { UserStatus } from "../../../generated/prisma/enums";
 import { User } from "../../../generated/prisma/client";
 
 
-const getMe = async (id: string): Promise<User | null> => {
-
+const getMe = async (id: string): Promise<Omit<User, 'password'> | null> => {
     const user = await prisma.user.findUnique({
         where: { id },
         include: {
             profile: true,
             role: true
+        },
+        omit: {
+            password: true,
         }
     });
     if (!user || user.status === UserStatus.deleted || user.profile?.isDeleted) {
