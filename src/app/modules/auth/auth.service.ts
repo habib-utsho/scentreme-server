@@ -37,14 +37,6 @@ const login = async (payload: TLoginUser) => {
         throw new AppError(StatusCodes.FORBIDDEN, "This profile is deleted!");
     }
 
-    const role = await prisma.role.findUnique({
-        where: { id: user.role_id },
-    });
-
-    if (!role) {
-        throw new AppError(StatusCodes.BAD_REQUEST, "Role not found!");
-    }
-
     //   Check if account is currently locked
     if (user.locked_until) {
         if (user.locked_until > new Date()) {
@@ -101,7 +93,7 @@ const login = async (payload: TLoginUser) => {
         userId: user.id,
         profileId: profile?.id,
         email: user.email,
-        role: role.name,
+        role: user.role,
         name: `${profile?.name}`,
         profileImg: profile?.avatar_url,
     };
@@ -176,17 +168,11 @@ const refreshToken = async (token: string) => {
         throw new AppError(StatusCodes.FORBIDDEN, 'This profile is deleted!')
     }
 
-    const role = await prisma.role.findUnique({ where: { id: user?.role_id } })
-
-    if (!role) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'Role not found!')
-    }
-
     const jwtPayload = {
         userId: user?.id,
         profileId: profile?.id,
         email: user?.email,
-        role: role?.name,
+        role: user.role,
         name: `${profile?.name}`,
         profileImg: profile?.avatar_url
     }
@@ -224,17 +210,11 @@ const forgetPassword = async (payload: Record<string, unknown>) => {
         throw new AppError(StatusCodes.FORBIDDEN, 'This profile is deleted!')
     }
 
-    const role = await prisma.role.findUnique({ where: { id: user?.role_id } })
-
-    if (!role) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'Role not found!')
-    }
-
     const jwtPayload = {
         userId: user?.id,
         profileId: profile?.id,
         email: user?.email,
-        role: role?.name,
+        role: user.role,
         name: profile?.name,
         profileImg: profile?.avatar_url
     }

@@ -10,8 +10,7 @@ const getMe = async (id: string): Promise<Omit<User, 'password'> | null> => {
     const user = await prisma.user.findUnique({
         where: { id },
         include: {
-            profile: true,
-            role: true
+            profile: true
         },
         omit: {
             password: true,

@@ -13,31 +13,28 @@ datasource db {
   provider = "postgresql"
 }
 
-model Role {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  users       User[]
-}
-
-
 enum UserStatus {
   active
   inactive
   deleted
 }
+
+enum Role {
+  admin
+  moderator
+  customer
+}
 enum Gender {
-  Men
-  Women
-  Unisex
+  Male
+  Female
+  Other
 }
 
 model User {
   id                    String     @id @default(uuid())
   email                 String     @unique
   password              String
-  role_id               String
+  role                  Role       @default(customer)
   last_login_at         DateTime?
   failed_login_attempts Int        @default(0)
   locked_until          DateTime?
@@ -45,15 +42,16 @@ model User {
   needsPasswordChange   Boolean    @default(false)
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
-  role                  Role       @relation(fields: [role_id], references: [id])
+
   profile               Profile?
+  addresses             Address[]
 }
 
 model Profile {
   id        String   @id @default(uuid())
   user_id   String   @unique
-  name      String?
-  phone     String? @unique 
+  name      String
+  phone     String @unique 
   date_of_birth DateTime?
   avatar_url String?
   gender    Gender?
@@ -61,4 +59,16 @@ model Profile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [user_id], references: [id])
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  user_id     String
+  fullAddress String
+  city        String
+  area        String?
+  postalCode  String?
+  isDefault   Boolean  @default(false)
+
+  user User @relation(fields: [user_id], references: [id])
 }

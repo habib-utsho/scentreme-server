@@ -6,11 +6,11 @@ import catchAsync from '../../lib/catchAsync'
 import * as cookie from 'cookie'
 import jwtVerify from '../utils/jwtVerify'
 import { prisma } from '../../lib/prisma'
-import { UserStatus } from '../../generated/prisma/enums'
+import { Role, UserStatus } from '../../generated/prisma/enums'
 import { env } from '../config/env'
 
 
-const auth = () => {
+const auth = (...requiredRoles: Role[]) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
         // Parse cookies from header
@@ -40,19 +40,22 @@ const auth = () => {
         const user = await prisma.user.findUnique({ where: { email } })
 
         if (!user) {
-            throw new AppError(StatusCodes.UNAUTHORIZED, 'This user is not found!')
+            throw new AppError(StatusCodes.NOT_FOUND, 'This user is not found!')
         }
 
         const isDeleted = user?.status === UserStatus.deleted
         const isInactive = user?.status === UserStatus.inactive
 
         if (isDeleted) {
-            throw new AppError(StatusCodes.UNAUTHORIZED, 'This user is deleted!')
+            throw new AppError(StatusCodes.GONE, 'This user is deleted!')
         }
         if (isInactive) {
-            throw new AppError(StatusCodes.FORBIDDEN, 'This user is not active!')
+            throw new AppError(StatusCodes.BAD_REQUEST, 'This user is not active!')
         }
 
+        if (requiredRoles.length && !requiredRoles.includes(user.role as Role)) {
+            throw new AppError(StatusCodes.FORBIDDEN, 'You do not have permission to access this resource!')
+        }
 
         req.user = decoded as JwtPayload
 

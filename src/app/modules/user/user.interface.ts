@@ -5,8 +5,8 @@ export type TUser = {
     name: string;
     phone: string;
     date_of_birth: string;
-    gender: "Men" | "Women" | "Unisex";
-    role_id: string | null;
+    gender: "Male" | "Female" | "Other";
+    role: "admin" | "moderator" | "customer";
     avatar_url: string | null;
     status: "active" | "inactive";
     last_login_at: Date | null;

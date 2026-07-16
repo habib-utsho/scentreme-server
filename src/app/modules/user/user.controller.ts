@@ -8,16 +8,26 @@ import { userFilterableFields, userSearchableFields } from "./user.constant";
 import { OPTIONS } from "../../constant";
 
 
-const createUser: RequestHandler = catchAsync(async (req: Request, res: Response) => {
-    const result = await userServices.createUser(req.body, req.file);
+const createCustomer: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const result = await userServices.createCustomer(req.body, req.file);
 
 
     sendResponse(res, StatusCodes.CREATED, {
         success: true,
-        message: 'User created successfully',
+        message: 'Customer created successfully',
         data: result
     });
 
+})
+
+const createAdminModerator: RequestHandler = catchAsync(async (req: Request, res: Response) => {
+    const result = await userServices.createAdminModerator(req.body, req.file);
+
+    sendResponse(res, StatusCodes.CREATED, {
+        success: true,
+        message: 'Admin/Moderator created successfully',
+        data: result
+    });
 })
 
 const getUsers: RequestHandler = catchAsync(async (req: Request, res: Response) => {
@@ -46,5 +56,4 @@ const getUserById: RequestHandler = catchAsync(async (req: Request, res: Respons
 
 
 
-
-export const userController = { createUser, getUsers, getUserById }
+export const userController = { createCustomer, createAdminModerator, getUsers, getUserById }

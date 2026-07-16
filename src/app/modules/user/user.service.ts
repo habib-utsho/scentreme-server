@@ -7,14 +7,9 @@ import { userSearchableFields } from "./user.constant";
 import { TOptions } from "../../interface";
 import calculatePagination from "../../utils/calculatePagination";
 import { uploadImgToCloudinary } from "../../utils/uploadImgToCloudinary";
+import { Role } from "../../../generated/prisma/enums";
 
-const createUser = async (payload: TUser, file: any) => {
-    const role = payload.role_id ? await prisma.role.findUnique({ where: { id: payload.role_id } }) : await prisma.role.findUnique({ where: { name: 'customer' } });
-    if (!role) {
-        throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid role_id provided or default customer role not found');
-    }
-
-
+const createCustomer = async (payload: TUser, file: any) => {
     const hashedPassword = await bcrypt.hash(payload.password, parseInt(process.env.SALT_ROUNDS || '10'));
     if (!hashedPassword) {
         throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Password hashing failed');
@@ -24,7 +19,70 @@ const createUser = async (payload: TUser, file: any) => {
     const userData = {
         email: payload.email,
         password: hashedPassword,
-        role_id: role.id,
+        role: Role.customer,
+        status: payload.status || 'active',
+        last_login_at: null,
+        failed_login_attempts: 0,
+        locked_until: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    }
+
+    const profile = {
+        name: payload.name,
+        phone: payload.phone,
+        date_of_birth: payload.date_of_birth ? new Date(payload.date_of_birth) : null,
+        avatar_url: payload.avatar_url,
+        gender: payload.gender,
+        isDeleted: payload.isDeleted || false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+    }
+
+
+    const result = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+            data: userData,
+            omit: {
+                password: true,
+            }
+        });
+
+        // file upload
+        if (file?.path) {
+            const cloudinaryRes = await uploadImgToCloudinary(
+                `${payload.name}-${Date.now()}`,
+                file.path,
+            )
+            if (cloudinaryRes?.secure_url) {
+                profile.avatar_url = cloudinaryRes.secure_url
+            }
+        }
+
+        const createdProfile = await tx.profile.create({
+            data: {
+                ...profile,
+                user_id: user.id,
+            }
+        });
+
+        return { user, profile: createdProfile };
+    });
+
+    return result;
+}
+
+const createAdminModerator = async (payload: TUser, file: any) => {
+    const hashedPassword = await bcrypt.hash(payload.password, parseInt(process.env.SALT_ROUNDS || '10'));
+    if (!hashedPassword) {
+        throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Password hashing failed');
+    }
+
+
+    const userData = {
+        email: payload.email,
+        password: hashedPassword,
+        role: Role[payload.role as keyof typeof Role] || Role.customer,
         status: payload.status || 'active',
         last_login_at: null,
         failed_login_attempts: 0,
@@ -135,7 +193,6 @@ const getUsers = async (query: Record<string, unknown>, options: TOptions) => {
                 password: true,
             },
             include: {
-                role: true,
                 profile: true
             }
         }),
@@ -149,11 +206,11 @@ const getUserById = async (id: string) => {
         where: {
             id
         },
-        include: {
-            role: true,
-        }
+        omit: {
+            password: true,
+        },
     });
     return user;
 }
 
-export const userServices = { createUser, getUsers, getUserById }
+export const userServices = { createCustomer, createAdminModerator, getUsers, getUserById }
