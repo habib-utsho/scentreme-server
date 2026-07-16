@@ -1,11 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authControllers = void 0;
 const http_status_codes_1 = require("http-status-codes");
-const sendResponse_1 = require("../../utils/sendResponse");
+const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const auth_service_1 = require("./auth.service");
-const appError_1 = require("../../errors/appError");
-const catchAsync_1 = require("../../../lib/catchAsync");
+const appError_1 = __importDefault(require("../../errors/appError"));
+const catchAsync_1 = __importDefault(require("../../../lib/catchAsync"));
 const env_1 = require("../../config/env");
 const login = (0, catchAsync_1.default)(async (req, res) => {
     const { accessToken, refreshToken, needsPasswordChange } = await auth_service_1.authServices.login(req.body);

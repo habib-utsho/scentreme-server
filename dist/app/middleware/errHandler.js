@@ -1,11 +1,15 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.globalErrHandler = exports.notFoundErrHandler = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const zod_1 = require("zod");
-const handleZodErr_1 = require("../errors/handleZodErr");
+const handleZodErr_1 = __importDefault(require("../errors/handleZodErr"));
 const client_1 = require("../../generated/prisma/client");
 const handlePrismaErr_1 = require("../errors/handlePrismaErr");
+const env_1 = require("../config/env");
 const notFoundErrHandler = (req, res) => {
     const error = new Error(`Not Found - ${req.originalUrl}`);
     res.status(http_status_codes_1.StatusCodes.NOT_FOUND).send({
@@ -52,7 +56,7 @@ const globalErrHandler = (err, req, res, next) => {
         success: false,
         message,
         errorSources,
-        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
+        stack: env_1.env.NODE_ENV === 'production' ? '🥞' : err.stack
     });
 };
 exports.globalErrHandler = globalErrHandler;

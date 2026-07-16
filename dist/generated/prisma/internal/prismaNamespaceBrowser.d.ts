@@ -3,9 +3,9 @@ export type * from '../models';
 export type * from './prismaNamespace';
 export declare const Decimal: typeof runtime.Decimal;
 export declare const NullTypes: {
-    DbNull: new (secret: never) => typeof runtime.DbNull;
-    JsonNull: new (secret: never) => typeof runtime.JsonNull;
-    AnyNull: new (secret: never) => typeof runtime.AnyNull;
+    DbNull: (new (secret: never) => typeof runtime.DbNull);
+    JsonNull: (new (secret: never) => typeof runtime.JsonNull);
+    AnyNull: (new (secret: never) => typeof runtime.AnyNull);
 };
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)

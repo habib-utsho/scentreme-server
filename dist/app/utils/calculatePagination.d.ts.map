@@ -1,1 +1,1 @@
-{"version":3,"file":"calculatePagination.d.ts","sourceRoot":"","sources":["../../../src/app/utils/calculatePagination.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,cAAc,CAAC;AAExC,QAAA,MAAM,mBAAmB,YAAa,QAAQ;;;;CAM7C,CAAA;AAED,eAAe,mBAAmB,CAAC"}
+{"version":3,"file":"calculatePagination.d.ts","sourceRoot":"","sources":["../../../src/app/utils/calculatePagination.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,cAAc,CAAC;AAExC,QAAA,MAAM,mBAAmB,GAAI,SAAS,QAAQ;;;;CAM7C,CAAA;AAED,eAAe,mBAAmB,CAAC"}

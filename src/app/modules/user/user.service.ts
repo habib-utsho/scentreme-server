@@ -48,6 +48,9 @@ const createUser = async (payload: TUser, file: any) => {
     const result = await prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
             data: userData,
+            omit: {
+                password: true,
+            }
         });
 
         // file upload

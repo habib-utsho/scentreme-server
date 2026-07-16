@@ -3,24 +3,24 @@ import { UserStatus } from "../../../generated/prisma/enums";
 import { JwtPayload } from "jsonwebtoken";
 export declare const authServices: {
     login: (payload: TLoginUser) => Promise<{
-        accessToken: any;
-        refreshToken: any;
+        accessToken: string;
+        refreshToken: string;
         data: {
             email: string;
             status: UserStatus;
             role_id: string;
             id: string;
+            createdAt: Date;
             last_login_at: Date | null;
             failed_login_attempts: number;
             locked_until: Date | null;
             needsPasswordChange: boolean;
-            createdAt: Date;
             updatedAt: Date;
         };
         needsPasswordChange: boolean;
     }>;
     refreshToken: (token: string) => Promise<{
-        accessToken: any;
+        accessToken: string;
     }>;
     forgetPassword: (payload: Record<string, unknown>) => Promise<{
         resetLink: string;
@@ -30,12 +30,12 @@ export declare const authServices: {
         status: UserStatus;
         role_id: string;
         id: string;
+        createdAt: Date;
         password: string;
         last_login_at: Date | null;
         failed_login_attempts: number;
         locked_until: Date | null;
         needsPasswordChange: boolean;
-        createdAt: Date;
         updatedAt: Date;
     }>;
     changePassword: (userPayload: JwtPayload, payload: TPasswordUpdate) => Promise<{
@@ -43,12 +43,12 @@ export declare const authServices: {
         status: UserStatus;
         role_id: string;
         id: string;
+        createdAt: Date;
         password: string;
         last_login_at: Date | null;
         failed_login_attempts: number;
         locked_until: Date | null;
         needsPasswordChange: boolean;
-        createdAt: Date;
         updatedAt: Date;
     }>;
 };

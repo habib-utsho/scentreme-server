@@ -1,15 +1,18 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authServices = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const prisma_1 = require("../../../lib/prisma");
-const appError_1 = require("../../errors/appError");
+const appError_1 = __importDefault(require("../../errors/appError"));
 const enums_1 = require("../../../generated/prisma/enums");
-const bcrypt_1 = require("bcrypt");
-const jsonwebtoken_1 = require("jsonwebtoken");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const sendEmail_1 = require("../../utils/sendEmail");
 const env_1 = require("../../config/env");
-const jwtVerify_1 = require("../../utils/jwtVerify");
+const jwtVerify_1 = __importDefault(require("../../utils/jwtVerify"));
 const login = async (payload) => {
     const user = await prisma_1.prisma.user.findUnique({
         where: { email: payload.email },
@@ -60,8 +63,8 @@ const login = async (payload) => {
             where: { id: user.id },
             data: {
                 failed_login_attempts: attempts,
-                ...(attempts >= parseInt(process.env.MAX_LOGIN_ATTEMPTS) && {
-                    locked_until: new Date(Date.now() + parseInt(process.env.LOCK_TIME)),
+                ...(attempts >= env_1.env.MAX_LOGIN_ATTEMPTS && {
+                    locked_until: new Date(Date.now() + env_1.env.LOCK_TIME),
                 }),
             },
         });
@@ -73,14 +76,14 @@ const login = async (payload) => {
         profileId: profile?.id,
         email: user.email,
         role: role.name,
-        name: `${profile?.firstName} ${profile?.lastName}`,
+        name: `${profile?.name}`,
         profileImg: profile?.avatar_url,
     };
-    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, process.env.JWT_ACCESS_SECRET, {
-        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
+    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, env_1.env.JWT_ACCESS_SECRET, {
+        expiresIn: env_1.env.JWT_ACCESS_EXPIRES_IN,
     });
-    const refreshToken = jsonwebtoken_1.default.sign(jwtPayload, process.env.JWT_REFRESH_SECRET, {
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+    const refreshToken = jsonwebtoken_1.default.sign(jwtPayload, env_1.env.JWT_REFRESH_SECRET, {
+        expiresIn: env_1.env.JWT_REFRESH_EXPIRES_IN,
     });
     await prisma_1.prisma.user.update({
         where: { id: user.id },
@@ -101,7 +104,7 @@ const login = async (payload) => {
 const refreshToken = async (token) => {
     let decoded;
     try {
-        decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_REFRESH_SECRET);
+        decoded = jsonwebtoken_1.default.verify(token, env_1.env.JWT_REFRESH_SECRET);
     }
     catch (e) {
         throw new appError_1.default(http_status_codes_1.StatusCodes.UNAUTHORIZED, 'You are not authorized!');
@@ -132,11 +135,11 @@ const refreshToken = async (token) => {
         profileId: profile?.id,
         email: user?.email,
         role: role?.name,
-        name: `${profile?.firstName} ${profile?.lastName}`,
+        name: `${profile?.name}`,
         profileImg: profile?.avatar_url
     };
-    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, process.env.JWT_ACCESS_SECRET, {
-        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
+    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, env_1.env.JWT_ACCESS_SECRET, {
+        expiresIn: env_1.env.JWT_ACCESS_EXPIRES_IN,
     });
     return {
         accessToken
@@ -166,13 +169,13 @@ const forgetPassword = async (payload) => {
         profileId: profile?.id,
         email: user?.email,
         role: role?.name,
-        name: `${profile?.firstName} ${profile?.lastName}`,
+        name: profile?.name,
         profileImg: profile?.avatar_url
     };
-    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, process.env.JWT_ACCESS_SECRET, {
+    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, env_1.env.JWT_ACCESS_SECRET, {
         expiresIn: '10m',
     });
-    const resetLink = `${process.env.CLIENT_URL}/reset-password?email=${user.email}&token=${accessToken}`;
+    const resetLink = `${env_1.env.CLIENT_URL}/reset-password?email=${user.email}&token=${accessToken}`;
     await (0, sendEmail_1.sendEmail)({
         toEmail: user.email,
         subject: `Reset Your Password – ${env_1.env.APP_NAME}`,
@@ -277,7 +280,7 @@ This link will expire in 10 minutes. If you did not request this, please ignore 
     </div>
 
     <div class="content">
-      <h2>Hello ${profile?.firstName || 'User '} ${profile?.lastName || ''},</h2>
+      <h2>Hello ${profile?.name || 'User '},</h2>
 
       <p>We received a request to reset your password for your ${env_1.env.APP_NAME} account.</p>
 
@@ -312,7 +315,7 @@ This link will expire in 10 minutes. If you did not request this, please ignore 
 };
 const resetPassword = async (payload, jwtPayload) => {
     console.log({ payload, jwtPayload });
-    const decoded = (await (0, jwtVerify_1.default)(payload.passwordChangeAccessToken, process.env.JWT_ACCESS_SECRET));
+    const decoded = (await (0, jwtVerify_1.default)(payload.passwordChangeAccessToken, env_1.env.JWT_ACCESS_SECRET));
     if (!decoded) {
         throw new appError_1.default(http_status_codes_1.StatusCodes.UNAUTHORIZED, 'You are not authorized to reset password!');
     }
@@ -332,7 +335,7 @@ const resetPassword = async (payload, jwtPayload) => {
     if (user.status === enums_1.UserStatus.deleted) {
         throw new appError_1.default(http_status_codes_1.StatusCodes.FORBIDDEN, 'This user is deleted!');
     }
-    const hashedPass = await bcrypt_1.default.hash(payload.newPassword, Number(process.env.SALT_ROUNDS));
+    const hashedPass = await bcrypt_1.default.hash(payload.newPassword, Number(env_1.env.SALT_ROUNDS));
     const result = await prisma_1.prisma.user.update({
         where: { email: payload.email },
         data: { password: hashedPass, needsPasswordChange: false }
@@ -357,7 +360,7 @@ const changePassword = async (userPayload, payload) => {
     if (!decryptPass) {
         throw new appError_1.default(http_status_codes_1.StatusCodes.FORBIDDEN, 'Old password is incorrect!');
     }
-    const hashedPass = await bcrypt_1.default.hash(payload.newPassword, Number(process.env.SALT_ROUNDS));
+    const hashedPass = await bcrypt_1.default.hash(payload.newPassword, Number(env_1.env.SALT_ROUNDS));
     const result = await prisma_1.prisma.user.update({
         where: { email: userPayload.email },
         data: { password: hashedPass, needsPasswordChange: false }

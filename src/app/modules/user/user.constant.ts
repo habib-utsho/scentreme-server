@@ -1,2 +1,2 @@
-export const userSearchableFields = ['email', "profile.name"];
-export const userFilterableFields = ['email', 'status', 'role_id', 'searchTerm'];
+export const userSearchableFields: readonly string[] = ['email', "profile.name"] as const;
+export const userFilterableFields: readonly string[] = ['email', 'status', 'role_id', 'searchTerm'] as const;

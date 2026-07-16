@@ -1,16 +1,16 @@
 export declare const roleServices: {
     createRole: (payload: any) => Promise<{
         id: string;
-        createdAt: Date;
         name: string;
         description: string | null;
+        createdAt: Date;
     }>;
     getRoles: (query: any) => Promise<{
         result: {
             id: string;
-            createdAt: Date;
             name: string;
             description: string | null;
+            createdAt: Date;
         }[];
         meta: {
             total: number;

@@ -21,7 +21,7 @@ export const env = z.object({
 
     // Login and account lockout configuration
     MAX_LOGIN_ATTEMPTS: z.coerce.number().default(3),
-    LOCK_TIME: z.coerce.number().default(10 * 60 * 1000), // 10 minutes in milliseconds
+    LOCK_TIME: z.coerce.number().default(10 * 60 * 1000),
     SALT_ROUNDS: z.coerce.number().default(12),
 
     // Cloudinary configuration

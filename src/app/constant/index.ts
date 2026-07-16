@@ -1,1 +1,1 @@
-export const OPTIONS = ['page', 'limit', 'sortBy', 'sortOrder'] as const;
+export const OPTIONS: readonly string[] = ['page', 'limit', 'sortBy', 'sortOrder'] as const;

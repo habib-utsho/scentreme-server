@@ -1,8 +1,8 @@
 export declare const authControllers: {
-    login: (req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: import("express").Response<any, Record<string, any>>, next: import("express").NextFunction) => void;
-    refreshToken: (req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: import("express").Response<any, Record<string, any>>, next: import("express").NextFunction) => void;
-    forgetPassword: (req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: import("express").Response<any, Record<string, any>>, next: import("express").NextFunction) => void;
-    resetPassword: (req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: import("express").Response<any, Record<string, any>>, next: import("express").NextFunction) => void;
-    changePassword: (req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>, res: import("express").Response<any, Record<string, any>>, next: import("express").NextFunction) => void;
+    login: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void;
+    refreshToken: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void;
+    forgetPassword: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void;
+    resetPassword: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void;
+    changePassword: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => void;
 };
 //# sourceMappingURL=auth.controller.d.ts.map

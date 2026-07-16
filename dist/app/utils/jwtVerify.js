@@ -1,8 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const jsonwebtoken_1 = require("jsonwebtoken");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const http_status_codes_1 = require("http-status-codes");
-const appError_1 = require("../errors/appError");
+const appError_1 = __importDefault(require("../errors/appError"));
 const jwtVerify = async (token, tokenSecret) => {
     let decoded;
     try {

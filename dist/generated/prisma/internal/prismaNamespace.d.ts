@@ -61,9 +61,9 @@ export type InputJsonObject = runtime.InputJsonObject;
 export type InputJsonArray = runtime.InputJsonArray;
 export type InputJsonValue = runtime.InputJsonValue;
 export declare const NullTypes: {
-    DbNull: new (secret: never) => typeof runtime.DbNull;
-    JsonNull: new (secret: never) => typeof runtime.JsonNull;
-    AnyNull: new (secret: never) => typeof runtime.AnyNull;
+    DbNull: (new (secret: never) => typeof runtime.DbNull);
+    JsonNull: (new (secret: never) => typeof runtime.JsonNull);
+    AnyNull: (new (secret: never) => typeof runtime.AnyNull);
 };
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
@@ -616,7 +616,7 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
 export type BatchPayload = {
     count: number;
 };
-export declare const defineExtension: runtime.ExtendsHook<"define", TypeMapCb<{}>, runtime.DefaultArgs, TypeMap<runtime.InternalArgs & runtime.DefaultArgs, {}>>;
+export declare const defineExtension: runtime.Types.Extensions.ExtendsHook<"define", TypeMapCb, runtime.Types.Extensions.DefaultArgs>;
 export type DefaultPrismaClient = PrismaClient;
 export type ErrorFormat = 'pretty' | 'colorless' | 'minimal';
 export type PrismaClientOptions = ({
