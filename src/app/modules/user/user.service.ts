@@ -39,7 +39,15 @@ const createCustomer = async (payload: TUser, file: any) => {
         updatedAt: new Date()
     }
 
-
+    if (file?.path) {
+        const cloudinaryRes = await uploadImgToCloudinary(
+            `${payload.name}-${Date.now()}`,
+            file.path,
+        )
+        if (cloudinaryRes?.secure_url) {
+            profile.avatar_url = cloudinaryRes.secure_url
+        }
+    }
     const result = await prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
             data: userData,
@@ -47,17 +55,6 @@ const createCustomer = async (payload: TUser, file: any) => {
                 password: true,
             }
         });
-
-        // file upload
-        if (file?.path) {
-            const cloudinaryRes = await uploadImgToCloudinary(
-                `${payload.name}-${Date.now()}`,
-                file.path,
-            )
-            if (cloudinaryRes?.secure_url) {
-                profile.avatar_url = cloudinaryRes.secure_url
-            }
-        }
 
         const createdProfile = await tx.profile.create({
             data: {
@@ -102,6 +99,17 @@ const createAdminModerator = async (payload: TUser, file: any) => {
         updatedAt: new Date()
     }
 
+    if (file?.path) {
+        const cloudinaryRes = await uploadImgToCloudinary(
+            `${payload.name}-${Date.now()}`,
+            file.path,
+        )
+
+        if (cloudinaryRes?.secure_url) {
+            profile.avatar_url = cloudinaryRes.secure_url
+        }
+    }
+
 
     const result = await prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
@@ -110,17 +118,6 @@ const createAdminModerator = async (payload: TUser, file: any) => {
                 password: true,
             }
         });
-
-        // file upload
-        if (file?.path) {
-            const cloudinaryRes = await uploadImgToCloudinary(
-                `${payload.name}-${Date.now()}`,
-                file.path,
-            )
-            if (cloudinaryRes?.secure_url) {
-                profile.avatar_url = cloudinaryRes.secure_url
-            }
-        }
 
         const createdProfile = await tx.profile.create({
             data: {

@@ -6,6 +6,7 @@ import catchAsync from "../../../lib/catchAsync";
 import pick from "../../utils/pick";
 import { userFilterableFields, userSearchableFields } from "./user.constant";
 import { OPTIONS } from "../../constant";
+import { firstLetterCapital } from "../../utils/firstLetterCapital";
 
 
 const createCustomer: RequestHandler = catchAsync(async (req: Request, res: Response) => {
@@ -25,7 +26,7 @@ const createAdminModerator: RequestHandler = catchAsync(async (req: Request, res
 
     sendResponse(res, StatusCodes.CREATED, {
         success: true,
-        message: 'Admin/Moderator created successfully',
+        message: `${firstLetterCapital(req.body.role)} created successfully`,
         data: result
     });
 })

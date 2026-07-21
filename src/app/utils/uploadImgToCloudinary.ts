@@ -17,25 +17,28 @@ export const uploadImgToCloudinary = async (
     fileName: string,
     filePath: string,
 ) => {
-    const res = await cloudinary.uploader
-        .upload(filePath, {
+    let res
+    try {
+        res = await cloudinary.uploader.upload(filePath, {
             public_id: fileName,
         })
-        .catch((error) => {
-            throw new AppError(
-                StatusCodes.INTERNAL_SERVER_ERROR,
-                `${error || 'Error uploading image to cloudinary'}`,
-            )
-            //   console.log(error)
-        })
+    } catch (error: any) {
+        // Clean up the local file even on failure
+        fs.unlink(filePath, () => { })
 
-    // Remove the file
+        console.error('Cloudinary upload error:', error)
+
+        throw new AppError(
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            error?.message || error?.error?.message || 'Error uploading image to cloudinary',
+        )
+    }
+
     fs.unlink(filePath, (err) => {
         if (err) {
             console.error(`Error removing file: ${err}`)
             return
         }
-
         console.log(`File ${filePath} has been successfully removed.`)
     })
 

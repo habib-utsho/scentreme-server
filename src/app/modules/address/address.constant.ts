@@ -1,0 +1,2 @@
+export const addressSearchableFields: readonly string[] = ["fullAddress"] as const;
+export const addressFilterableFields: readonly string[] = ["city", "area", "postalCode", "isDefault", "searchTerm"] as const;
