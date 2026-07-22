@@ -18,6 +18,8 @@ const assertOwnerOrAdmin = async (addressId: string, userId: string, isAdmin: bo
         throw new AppError(StatusCodes.FORBIDDEN, "You do not have permission to access this address");
     }
 
+
+
     return address;
 };
 
